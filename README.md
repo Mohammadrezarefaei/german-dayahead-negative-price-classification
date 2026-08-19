@@ -1,5 +1,4 @@
-![SMARD Pipeline CI](https://github.com/Mohammadrezarefaei/german-dayahead-negative-price-classification
-/actions/workflows/ci.yml/badge.svg)
+[![SMARD Pipeline CI](https://github.com/Mohammadrezarefaei/german-dayahead-negative-price-classification/actions/workflows/ci.yml/badge.svg)](https://github.com/Mohammadrezarefaei/german-dayahead-negative-price-classification/actions)
 # ⚡ Negative Electricity Price Prediction & Risk Classification (Germany Day-Ahead Market)
 
 An end-to-end machine learning pipeline analyzing and classifying negative spot price events ($Price < 0 \text{ EUR/MWh}$) on the German Day-Ahead power exchange (**EPEX Spot / SMARD**) driven by renewable oversupply and inelastic grid demand.
