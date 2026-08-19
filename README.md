@@ -1,61 +1,38 @@
+# ⚡ German Day-Ahead Electricity Market & Negative Price Classifier
+
 [![SMARD Pipeline CI](https://github.com/Mohammadrezarefaei/german-dayahead-negative-price-classification/actions/workflows/ci.yml/badge.svg)](https://github.com/Mohammadrezarefaei/german-dayahead-negative-price-classification/actions)
-# ⚡ Negative Electricity Price Prediction & Risk Classification (Germany Day-Ahead Market)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://german-dayahead-negative-price-classification.streamlit.app/)
 
-An end-to-end machine learning pipeline analyzing and classifying negative spot price events ($Price < 0 \text{ EUR/MWh}$) on the German Day-Ahead power exchange (**EPEX Spot / SMARD**) driven by renewable oversupply and inelastic grid demand.
-
----
-
-## 📌 Project Overview
-As renewable generation scales across the German grid, hours with high wind and solar feed-in combined with low residual demand increasingly trigger negative electricity prices (the "cannibalization effect"). 
-
-This project formulates negative spot pricing as a **supervised classification problem**, providing day-ahead risk probabilities for trading desks, battery storage operators (BESS), and renewable asset managers.
-
-* **Market Domain:** German Day-Ahead Bidding Zone (LU/DE)
-* **Data Sources:** Bundesnetzagentur / SMARD.de (Renewable Generation & Market Fundamentals)
-* **Target Variable:** Binary Flag `is_negative_price` ($1 \text{ if } \text{Price} < 0 \text{ EUR/MWh else } 0$)
-* **Core Physics/Market Drivers:** Net Residual Load, Renewable Penetration Share, and Diurnal/Weekend Cyclicality.
+An automated quantitative pipeline and interactive risk-management tool for the **German EPEX Spot Day-Ahead Market**. Ingests regulatory grid and generation metrics (**SMARD / Bundesnetzagentur**), predicts negative price events driven by renewable feed-in spikes, and models economic curtailment under **EEG §51**.
 
 ---
 
-## 📊 Classification Benchmark Results
-
-Evaluated on an out-of-sample test split (last 20% time horizon):
-
-| Classifier | Accuracy | Precision | Recall | F1-Score | ROC-AUC |
-| :--- | :---: | :---: | :---: | :---: | :---: |
-| **Random Forest** | **0.9583** | **0.9167** | **0.9429** | **0.9296** | **0.9810** |
-| **Hist Gradient Boosting** | 0.9479 | 0.9091 | 0.9143 | 0.9117 | 0.9745 |
-| **Logistic Regression** | 0.8958 | 0.8205 | 0.9143 | 0.8649 | 0.9320 |
+## 🚀 Live Interactive Demo
+👉 **[Access the Live Streamlit Web App](https://german-dayahead-negative-price-classification.streamlit.app/)**
 
 ---
 
-## 📈 Visualizations & Market Dynamics
+## 📌 Market Physics & Merit-Order Dynamics
 
-### Merit-Order Curve & Model ROC Curves
-![Merit-Order & ROC Curves](negative_price_benchmark.png)
-
-### Key Drivers (Permutation Feature Importance)
-![Feature Importance](negative_price_feature_importance.png)
-
----
-
-## 🛠️ Tech Stack
-* **Language:** Python 3.10+
-* **Data Processing:** `pandas`, `numpy`
-* **Machine Learning:** `scikit-learn` (`RandomForestClassifier`, `HistGradientBoostingClassifier`, `LogisticRegression`)
-* **Visualization:** `matplotlib`, `seaborn`
+Negative electricity prices occur when non-dispatchable generation (Wind + Solar) exceeds national load, coupled with thermal plant inflexibility:
+* **Residual Load Formulation:**
+  $$\text{Residual Load} = P_{\text{Demand}} - (P_{\text{Wind}} + P_{\text{Solar}})$$
+* **Renewable Cannibalization:** Inflection points occur when renewable penetration exceeds $75\%$ of real-time demand, compressing marginal clearing prices below €0/MWh.
+* **EEG §51 Curtailment Shield:** Calculates financial balancing penalties avoided by executing economic curtailment during consecutive negative market hours.
 
 ---
 
-## 🚀 How to Run Locally
+## 🔍 Model Validation & Regime Boundary Analysis
 
-```bash
-# 1. Clone the repository
-git clone [https://github.com/](https://github.com/)<YOUR_USERNAME>/german-dayahead-negative-price-classification.git
-cd german-dayahead-negative-price-classification
+The classifier and risk framework were stress-tested across distinct German wholesale market regimes:
 
-# 2. Install dependencies
-pip install pandas numpy scikit-learn matplotlib
+* **High Renewable Influx (Surplus Regime):** When Residual Load drops below **10.0 GW**, negative price risk escalates rapidly ($>80\%$), triggering automated curtailment signals.
+* **Tight Baseload Regime (High Demand / Dunkelflaute):** When Residual Load exceeds **35.0 GW**, price risks remain $<5\%$, ensuring standard merit-order dispatch.
+* **Boundary Limitation:** In borderline regimes (10–14 GW Residual Load), price formation is highly sensitive to cross-border interconnector flows (imports/exports with France, Austria, and Scandinavia), which can mitigate local negative price events.
 
-# 3. Launch Jupyter Notebook
-jupyter notebook negative_price_classification.ipynb
+---
+
+## 🛠️ Software Architecture & Automated Testing
+* **CI/CD Pipeline:** Fully automated testing via **GitHub Actions** (`pytest` test suite covering residual load balance, classification flags, and curtailment calculations).
+* **Modular Core Engine:** Located in `src/smard_engine.py`.
+* **Tech Stack:** Python 3.11, NumPy, Pandas, Matplotlib, Streamlit, Pytest.
